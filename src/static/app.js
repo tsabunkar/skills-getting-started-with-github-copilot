@@ -20,17 +20,6 @@ document.addEventListener("DOMContentLoaded", () => {
         activityCard.className = "activity-card";
 
         const spotsLeft = details.max_participants - details.participants.length;
-        const participantItems = details.participants.length
-          ? details.participants
-              .map(
-                (participant) => `
-                  <li>
-                    <span>${participant}</span>
-                    <button class="delete-participant" type="button" data-activity="${name}" data-email="${participant}" aria-label="Unregister ${participant}" title="Unregister participant">&#x2715;</button>
-                  </li>`
-              )
-              .join("")
-          : "<li class=\"no-participants\">No participants yet</li>";
 
         activityCard.innerHTML = `
           <h4>${name}</h4>
@@ -39,9 +28,36 @@ document.addEventListener("DOMContentLoaded", () => {
           <p><strong>Availability:</strong> ${spotsLeft} spots left</p>
           <div class="participants">
             <strong>Participants</strong>
-            <ul>${participantItems}</ul>
+            <ul class="participants-list"></ul>
           </div>
         `;
+
+        const participantsList = activityCard.querySelector(".participants-list");
+        if (details.participants.length) {
+          details.participants.forEach((participant) => {
+            const li = document.createElement("li");
+
+            const span = document.createElement("span");
+            span.textContent = participant;
+
+            const button = document.createElement("button");
+            button.className = "delete-participant";
+            button.type = "button";
+            button.dataset.activity = name;
+            button.dataset.email = participant;
+            button.setAttribute("aria-label", `Unregister ${participant}`);
+            button.title = "Unregister participant";
+            button.textContent = "×";
+
+            li.append(span, button);
+            participantsList.appendChild(li);
+          });
+        } else {
+          const li = document.createElement("li");
+          li.className = "no-participants";
+          li.textContent = "No participants yet";
+          participantsList.appendChild(li);
+        }
 
         activitiesList.appendChild(activityCard);
 
