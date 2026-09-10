@@ -163,3 +163,22 @@ def test_unregister_requires_email(client):
 
     # Assert
     assert response.status_code == 422
+
+
+def test_signup_rejects_when_activity_is_full(client):
+    # Arrange
+    activity_name = "Chess Club"
+    # Fill the activity to capacity
+    app_module.activities[activity_name]["participants"] = [
+        f"student{i}@mergington.edu" for i in range(app_module.activities[activity_name]["max_participants"])
+    ]
+
+    # Act
+    response = client.post(
+        f"/activities/{activity_name}/signup",
+        params={"email": "latecomer@mergington.edu"},
+    )
+
+    # Assert
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Activity is full"
